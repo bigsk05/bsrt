@@ -16,16 +16,18 @@ class Calendar(object):
         {"name": 'November',  "numdays": 30},
         {"name": 'December',  "numdays": 31}
         ]
-    def getTimeLocal(self,docpm=False,docdst=False):
-        #此处未写完
-        dochr = readTextBox('hrbox', 2, 1, 1, 0, 23, 12)
-        docmn = readTextBox('mnbox', 2, 1, 1, 0, 59, 0)
-        docsc = readTextBox('scbox', 2, 1, 1, 0, 59, 0)
-        docpm = document.getElementById('pmbox').checked
-        docdst = document.getElementById('dstCheckbox').checked
-        if ( (docpm) and (dochr < 12) ):
+    def getTimeLocal(self,hr=int(time.strftime("%H",time.localtime())),mn=int(time.strftime("%M",time.localtime())),sc=int(time.strftime("%S",time.localtime())),docpm=False,docdst=False,stamp=0):
+        if(stamp==0):
+            dochr=hr
+            docmn=mn
+            docsc=sc
+        else:
+            dochr=int(time.strftime("%H",time.localtime(stamp)))
+            docmn=int(time.strftime("%M",time.localtime(stamp)))
+            docsc=int(time.strftime("%S",time.localtime(stamp)))
+        if((docpm) and (dochr < 12)):
             dochr += 12
-        if (docdst) :
+        if(docdst):
             dochr -= 1
         mins = dochr * 60 + docmn + docsc/60.0
         return mins
@@ -97,15 +99,26 @@ class Calendar(object):
     def calcGeomMeanAnomalySun(self,t):
         M = 357.52911 + t * (35999.05029 - 0.0001537 * t)
         return M
-    def calcSunDeclination(self,t=None,zone=8):
-        #此处未写完
-        if(t==None):
+    def calcSunDeclination(self,year=0,month=0,day=0,hour=0,minute=0,second=0,stamp=0,zone=8,pm=False,dst=False):
+        if(stamp==0 and year==0 and day==0 and month==0 and hour==0 and minute==0 and second==0):
+            jday=self.getJD()
+            tl=self.getTimeLocal()
+            total=jday + tl/1440.0 - zone/24.0
+            t=self.calcTimeJulianCent(total)
+        elif(stamp!=0 and year==0 and day==0 and month==0 and hour==0 and minute==0 and second==0):
+            jday=self.getJD(stamp=stamp)
+            tl=self.getTimeLocal(stamp=stamp)
+            total=jday + tl/1440.0 - zone/24.0
+            t=self.calcTimeJulianCent(total)
+        else:
+            jday=self.getJD(year=year,month=month,day=day)
+            tl=self.getTimeLocal(hr=hour,mn=minute,sc=second)
             total=jday + tl/1440.0 - zone/24.0
             t=self.calcTimeJulianCent(total)
         e = self.calcObliquityCorrection(t)
         Lambda = self.calcSunApparentLong(t)
         sint = math.sin(math.radians(e)) * math.sin(math.radians(Lambda))
         theta = math.degrees(math.asin(sint))
-        return math.floor(theta*100+0.5)/100.0
+        return (theta*100+0.5)/100.0
 c=Calendar()
-print(c.getJD())
+print(c.calcSunDeclination())
