@@ -121,7 +121,6 @@ class Calendar(object):
         theta = math.degrees(math.asin(sint))
         return (theta*100+0.5)/100.0
     def calcSunDeclination(self,Stamp=None,PM=False,DST=False,TimeZone=8):
-        #此函数尚未完成
         MonthList = [
         {"name": 'January',   "numdays": 31},
         {"name": 'February',  "numdays": 28},
@@ -144,9 +143,9 @@ class Calendar(object):
         Month=int(time.strftime("%m",time.localtime(TimeStamp)))
         Day=int(time.strftime("%d",time.localtime(TimeStamp)))
         Hour=int(time.strftime("%H",time.localtime(TimeStamp)))
-        Minute=int(time.strftime("%m",time.localtime(TimeStamp)))
-        Second=int(time.strftime("%s",time.localtime(TimeStamp)))
-        if((Year % 4 == 0 and Year % 100 != 0) or Year % 400 == 0) and (month == 2)):
+        Minute=int(time.strftime("%M",time.localtime(TimeStamp)))
+        Second=int(time.strftime("%S",time.localtime(TimeStamp)))
+        if(((Year % 4 == 0 and Year % 100 != 0) or Year % 400 == 0) and (Month == 2)):
             if(Day > 29):
                 Day=29
         else:
@@ -158,5 +157,11 @@ class Calendar(object):
         JDay = math.floor(365.25*(Year + 4716)) + math.floor(30.6001*(Month+1)) + Day + 2 - math.floor(Year/100) + math.floor(math.floor(Year/100)/4) - 1524.5
         Minutes = Hour * 60 + Minute + Second/60.0
         TimeJulianCent = (JDay + Minutes/1440.0 - TimeZone/24.0 - 2451545.0)/36525.0
+        L0 = 280.46646 + TimeJulianCent * (36000.76983 + TimeJulianCent * (0.0003032))
+        while(L0 > 360.0):
+            L0 -= 360.0
+        while(L0 < 0.0):
+            L0 += 360.0
+        return (math.degrees(math.asin(math.sin(math.radians(23.0 + (26.0 + ((21.448 - TimeJulianCent * (46.8150 + TimeJulianCent * (0.00059 - TimeJulianCent * (0.001813)))) / 60.0)) / 60.0 + 0.00256 * math.cos(math.radians(125.04 - 1934.136 * TimeJulianCent)))) * math.sin(math.radians(L0 + math.sin(math.radians(357.52911 + TimeJulianCent * (35999.05029 - 0.0001537 * TimeJulianCent))) * (1.914602 - TimeJulianCent * (0.004817 + 0.000014 * TimeJulianCent)) + math.sin(math.radians(357.52911 + TimeJulianCent * (35999.05029 - 0.0001537 * TimeJulianCent)) * 2) * (0.019993 - 0.000101 * TimeJulianCent) + math.sin(math.radians(357.52911 + TimeJulianCent * (35999.05029 - 0.0001537 * TimeJulianCent)) * 3) * 0.000289 - 0.00569 - 0.00478 * math.sin(math.radians(125.04 - 1934.136 * TimeJulianCent)))))) * 100 + 0.5) / 100.0
 c=Calendar()
 print(c.calcSunDeclination())
