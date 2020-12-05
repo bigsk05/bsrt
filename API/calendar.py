@@ -99,7 +99,7 @@ class Calendar(object):
     def calcGeomMeanAnomalySun(self,t):
         M = 357.52911 + t * (35999.05029 - 0.0001537 * t)
         return M
-    def calcSunDeclination(self,year=0,month=0,day=0,hour=0,minute=0,second=0,stamp=0,zone=8,pm=False,dst=False):
+    def calcSunDeclinationOld(self,year=0,month=0,day=0,hour=0,minute=0,second=0,stamp=0,zone=8,pm=False,dst=False):
         if(stamp==0 and year==0 and day==0 and month==0 and hour==0 and minute==0 and second==0):
             jday=self.getJD()
             tl=self.getTimeLocal()
@@ -120,5 +120,43 @@ class Calendar(object):
         sint = math.sin(math.radians(e)) * math.sin(math.radians(Lambda))
         theta = math.degrees(math.asin(sint))
         return (theta*100+0.5)/100.0
+    def calcSunDeclination(self,Stamp=None,PM=False,DST=False,TimeZone=8):
+        #此函数尚未完成
+        MonthList = [
+        {"name": 'January',   "numdays": 31},
+        {"name": 'February',  "numdays": 28},
+        {"name": 'March',     "numdays": 31},
+        {"name": 'April',     "numdays": 30},
+        {"name": 'May',       "numdays": 31},
+        {"name": 'June',      "numdays": 30},
+        {"name": 'July',      "numdays": 31},
+        {"name": 'August',    "numdays": 31},
+        {"name": 'September', "numdays": 30},
+        {"name": 'October',   "numdays": 31},
+        {"name": 'November',  "numdays": 30},
+        {"name": 'December',  "numdays": 31}
+        ]
+        if(Stamp==None):
+            TimeStamp = time.time()
+        else:
+            TimeStamp = Stamp
+        Year=int(time.strftime("%Y",time.localtime(TimeStamp)))
+        Month=int(time.strftime("%m",time.localtime(TimeStamp)))
+        Day=int(time.strftime("%d",time.localtime(TimeStamp)))
+        Hour=int(time.strftime("%H",time.localtime(TimeStamp)))
+        Minute=int(time.strftime("%m",time.localtime(TimeStamp)))
+        Second=int(time.strftime("%s",time.localtime(TimeStamp)))
+        if((Year % 4 == 0 and Year % 100 != 0) or Year % 400 == 0) and (month == 2)):
+            if(Day > 29):
+                Day=29
+        else:
+            if(Day > MonthList[Month-1]['numdays']):
+                Day = MonthList[Month-1]['numdays']
+        if(Month <= 2):
+            Year -= 1
+            Month += 12
+        JDay = math.floor(365.25*(Year + 4716)) + math.floor(30.6001*(Month+1)) + Day + 2 - math.floor(Year/100) + math.floor(math.floor(Year/100)/4) - 1524.5
+        Minutes = Hour * 60 + Minute + Second/60.0
+        TimeJulianCent = (JDay + Minutes/1440.0 - TimeZone/24.0 - 2451545.0)/36525.0
 c=Calendar()
 print(c.calcSunDeclination())
