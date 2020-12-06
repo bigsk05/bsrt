@@ -89,6 +89,7 @@ class Calendar(object):
             HourAngle += 360.0
         return HourAngle
     def calcSunAzEl(self,Stamp=None,Lon=120,Lat=30,TimeZone=8,ZeroAzimuth="North"):
+        #此函数正在改进
         MonthList = [
         {"name": 'January',   "numdays": 31},
         {"name": 'February',  "numdays": 28},
@@ -169,6 +170,3 @@ class Calendar(object):
         solarZen = zenith - refractionCorrection
         return {"Az":(math.floor(azimuth*100 +0.5) - (ZeroAzimuth*100))/100.0,"El":(math.floor((90.0-solarZen)*100+0.5)/100.0)}
 c=Calendar()
-while(True):
-    print(c.calcSunAzEl())
-    time.sleep(0.1)
