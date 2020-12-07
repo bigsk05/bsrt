@@ -1,7 +1,7 @@
 # BringSpark灵火 射电望远镜
 
 ## 灵曦业火，丈显星茫
-
+## 有关课题最新进度，详见Gitee的Pull与(项目组长博客)[https://www.xiaxinzhe.cn]
 
 ```
 课题名称：射电望远镜制作——射电天文学探究
