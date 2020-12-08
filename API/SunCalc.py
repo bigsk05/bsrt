@@ -89,7 +89,6 @@ class Calendar(object):
             HourAngle += 360.0
         return HourAngle
     def calcSunAzEl(self,Stamp=None,Lon=120,Lat=30,TimeZone=8,ZeroAzimuth="North"):
-        #此函数正在改进
         MonthList = [
         {"name": 'January',   "numdays": 31},
         {"name": 'February',  "numdays": 28},
@@ -124,35 +123,29 @@ class Calendar(object):
             Year -= 1
             Month += 12
         ZeroAzimuth=180 if(ZeroAzimuth=="South") else 0
-        HourAngle=self.calcHourAngle(Stamp,Lon,TimeZone)
-        theta=self.calcSunDeclination(Stamp,TimeZone)
-        haRad = math.radians(HourAngle)
-        csz = math.sin(math.radians(Lat)) * math.sin(math.radians(theta)) + math.cos(math.radians(Lat)) * math.cos(math.radians(theta)) * math.cos(haRad)
-        if(csz > 1.0):
-            csz = 1.0
-        elif(csz < -1.0):
-            csz = -1.0
-        zenith = math.degrees(math.acos(csz))
-        azDenom = ( math.cos(math.radians(Lat)) * math.sin(math.radians(zenith)) )
-        if(abs(azDenom) > 0.001):
-            azRad = (( math.sin(math.radians(Lat)) * math.cos(math.radians(zenith)) ) - math.sin(math.radians(theta))) / azDenom
+        csz = math.sin(math.radians(Lat)) * math.sin(math.radians(self.calcSunDeclination(Stamp,TimeZone))) + math.cos(math.radians(Lat)) * math.cos(math.radians(self.calcSunDeclination(Stamp,TimeZone))) * math.cos(math.radians(self.calcHourAngle(Stamp,Lon,TimeZone)))
+        if(csz > 1):
+            csz = 1
+        elif(csz < -1):
+            csz = -1
+        if(abs((math.cos(math.radians(Lat)) * math.sin(math.radians(math.degrees(math.acos(csz)))))) > 0.001):
+            azRad = ((math.sin(math.radians(Lat)) * math.cos(math.radians(math.degrees(math.acos(csz))))) - math.sin(math.radians(self.calcSunDeclination(Stamp,TimeZone)))) / (math.cos(math.radians(Lat)) * math.sin(math.radians(math.degrees(math.acos(csz)))))
             if(abs(azRad) > 1.0):
                 if(azRad < 0):
                     azRad = -1.0
                 else:
                     azRad = 1.0
             azimuth = 180.0 - math.degrees(math.acos(azRad))
-            if(HourAngle > 0.0):
+            if(self.calcHourAngle(Stamp,Lon,TimeZone) > 0.0):
                 azimuth = -azimuth
         else:
-            if (Lat > 0.0):
+            if(Lat > 0.0):
                 azimuth = 180.0
             else:
                 azimuth = 0.0
         if(azimuth < 0.0):
             azimuth += 360.0
-        exoatmElevation = 90.0 - zenith
-
+        exoatmElevation = (90.0 - math.degrees(math.acos(csz)))
         if (exoatmElevation > 85.0):
             refractionCorrection = 0.0
         else:
@@ -163,10 +156,6 @@ class Calendar(object):
                 refractionCorrection = 1735.0 + exoatmElevation * (-518.2 + exoatmElevation * (103.4 + exoatmElevation * (-12.79 + exoatmElevation * 0.711) ) )
             else:
                 refractionCorrection = -20.774 / te
-            
             refractionCorrection = refractionCorrection / 3600.0
-        
-
-        solarZen = zenith - refractionCorrection
-        return {"Az":(math.floor(azimuth*100 +0.5) - (ZeroAzimuth*100))/100.0,"El":(math.floor((90.0-solarZen)*100+0.5)/100.0)}
-c=Calendar()
+        solarZen = math.degrees(math.acos(csz)) - refractionCorrection
+        return {"az":((azimuth*100 +0.5) - (ZeroAzimuth*100))/100.0,"el":((90.0-solarZen)*100+0.5)/100.0}
