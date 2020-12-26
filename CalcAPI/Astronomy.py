@@ -1,6 +1,6 @@
 import os,time,math
 #-------------------------------------#
-class Calendar(object):
+class Astronomy(object):
     def calcSunDeclination(self,Stamp=None,TimeZone=8):
         MonthList = [
         {"name": 'January',   "numdays": 31},
