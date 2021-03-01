@@ -35,11 +35,11 @@ void loop() {
     if(c < 1000){
       Serial.print("From 1:");
       Serial.println(c);
-      myservo1.write(c);
+      myservo1.write(c-1000);
     }else if(1000 < c < 2000){
       Serial.print("From 2:");
       Serial.println(c);
-      myservo2.write(c);
+      myservo2.write(c-2000);
     }
   }
   if (millis() - lastConnectionTime > postingInterval) {
