@@ -1,7 +1,7 @@
 /*
 BringSpark Controller
 Author: Bigsk(https://xiaxinzhe.cn)
-Date: 2021.2.28 17:11
+Date: 2021.3.3 15:42
 Copyright GHINK Network Stduio
 */
 
@@ -13,14 +13,12 @@ byte mac[] = {
   0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xED
 };
 IPAddress ip(192, 168, 1, 3);
-EthernetClient client;
+EthernetClient client1,client2;
 IPAddress server(192,168,1,2);//Server IP
-Servo myservo1;
-Servo myservo2;
+Servo myservo1,myservo2;
 
-int pos = 0;
-unsigned long lastConnectionTime = 0;
-const unsigned long postingInterval = 10L * 10L;
+unsigned long lastConnectionTime1,lastConnectionTime2 = 0;
+const unsigned long postingInterval1,postingInterval2 = 10L * 10L;
 
 void setup() {
   Serial.begin(9600);
@@ -30,29 +28,41 @@ void setup() {
 }
 
 void loop() {
-  if (client.available()) {
-    int c = client.read();
-    if(c < 1000){
-      Serial.print("From 1:");
-      Serial.println(c);
-      myservo1.write(c-1000);
-    }else if(1000 < c < 2000){
-      Serial.print("From 2:");
-      Serial.println(c);
-      myservo2.write(c-2000);
-    }
+  if (client1.available()) {
+    int c = client1.read();
+    Serial.print("From 1:");
+    Serial.println(c);
+    myservo1.write(c);
   }
-  if (millis() - lastConnectionTime > postingInterval) {
-    httpRequest();
+  if (client2.available()) {
+    int c = client2.read();
+    Serial.print("From 2:");
+    Serial.println(c);
+    myservo2.write(c);
+  }
+  if (millis() - lastConnectionTime1 > postingInterval1) {
+    httpRequest1();
+  }
+  if (millis() - lastConnectionTime2 > postingInterval2) {
+    httpRequest2();
   }
 }
 
-void httpRequest() {
-  client.stop();
+void httpRequest1() {
+  client1.stop();
 
-  if (client.connect(server, 8000)) {//Server Port
-    client.println();
+  if (client1.connect(server, 8001)) {//Server Port
+    client1.println();
 
-    lastConnectionTime = millis();
+    lastConnectionTime1 = millis();
+  }
+}
+void httpRequest2() {
+  client2.stop();
+
+  if (client2.connect(server, 8002)) {//Server Port
+    client2.println();
+
+    lastConnectionTime2 = millis();
   }
 }
