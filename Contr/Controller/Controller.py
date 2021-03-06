@@ -180,7 +180,7 @@ def m1(deg):
         log("SetDeg M1 : "+str(deg))
         try:
             client1 = socket.socket()
-            client1.connect(('192.168.1.3',8001))
+            client1.connect(('192.168.0.3',8001))
             client1.send(chr(deg).encode())
             time.sleep(1)
             client1.close()
@@ -193,7 +193,7 @@ def m2(deg):
         log("SetDeg M2 : "+str(deg))
         try:
             client2 = socket.socket()
-            client2.connect(('192.168.1.3',8002))
+            client2.connect(('192.168.0.3',8002))
             client2.send(chr(deg).encode())
             time.sleep(1)
             client2.close()
@@ -207,14 +207,15 @@ def auto():
             break
         if switch=="auto":
             param=CalcSun().calcSunAzEl()
-            try:
-                m1(param["az"])
-            except:
-                pass
-            try:
-                m2(param["el"])
-            except:
-                pass
+            if param["az"] <= 180 and param["az"] >= 0 and param["el"] <= 180 and param["el"] >= 0: 
+                try:
+                    m1(param["az"])
+                except:
+                    pass
+                try:
+                    m2(param["el"])
+                except:
+                    pass
 def rand():
     global switch,killer
     while True:

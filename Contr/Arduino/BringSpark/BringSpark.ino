@@ -12,9 +12,9 @@ Copyright GHINK Network Studio
 byte mac[] = {
   0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xED
 };
-IPAddress ip(192, 168, 1, 3);
+IPAddress ip(192, 168, 0, 3);
 EthernetClient client1,client2;
-IPAddress server(192, 168,  1,  2);//Server IP
+IPAddress server(192, 168, 0, 2);//Server IP
 Servo myservo1,myservo2;
 
 unsigned long lastConnectionTime1,lastConnectionTime2 = 0;
