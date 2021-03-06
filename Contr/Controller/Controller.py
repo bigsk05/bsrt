@@ -1,12 +1,12 @@
-import socket,random,threading,time,os,math,json
 '''
 BringSpark Controller
 Author: Bigsk(https://xiaxinzhe.cn)
 Date: 2021.3.3 15:42
 Copyright GHINK Network Stduio
 '''
+import socket,random,threading,time,os,math,json,sys
 #-------------------------------------#
-class Calc(object):
+class CalcSun(object):
     def calcSunDeclination(self,Stamp=None,TimeZone=8):
         MonthList = [
         {"name": 'January',   "numdays": 31},
@@ -168,32 +168,45 @@ class Calc(object):
 #-------------------------------------#
 
 now=[90,90]
-autoSwitch=True
+switch="auto"
+killer=False
 
 #-------------------------------------#
+def log(text):
+    print("[",time.strftime("%H:%M:%S",time.localtime()),"]",text)
 def m1(deg):
     deg=round(deg)
-    if deg != now[0] and deg > 0:
-        client1 = socket.socket()
-        client1.connect(('192.168.1.3',8001))
-        client1.send(chr(deg).encode())
-        time.sleep(1)
-        client1.close()
-        now[0]=deg
+    if deg != now[0] and deg >= 0:
+        log("SetDeg M1 : "+str(deg))
+        try:
+            client1 = socket.socket()
+            client1.connect(('192.168.1.3',8001))
+            client1.send(chr(deg).encode())
+            time.sleep(1)
+            client1.close()
+            now[0]=deg
+        except:
+            pass
 def m2(deg):
     deg=round(deg)
-    if deg != now[1] and deg > 0:
-        client2 = socket.socket()
-        client2.connect(('192.168.1.3',8002))
-        client2.send(chr(deg).encode())
-        time.sleep(1)
-        client2.close()
-        now[1]=deg
+    if deg != now[1] and deg >= 0:
+        log("SetDeg M2 : "+str(deg))
+        try:
+            client2 = socket.socket()
+            client2.connect(('192.168.1.3',8002))
+            client2.send(chr(deg).encode())
+            time.sleep(1)
+            client2.close()
+            now[1]=deg
+        except:
+            pass
 def auto():
-    global autoSwitch
+    global switch,killer
     while True:
-        if autoSwitch:
-            param=Calc().calcSunAzEl()
+        if killer==True:
+            break
+        if switch=="auto":
+            param=CalcSun().calcSunAzEl()
             try:
                 m1(param["az"])
             except:
@@ -202,7 +215,44 @@ def auto():
                 m2(param["el"])
             except:
                 pass
+def rand():
+    global switch,killer
+    while True:
+        if killer==True:
+            break
+        if switch=="rand":
+            param=(random.randint(0,180),random.randint(0,180))
+            try:
+                m1(param[0])
+            except:
+                pass
+            try:
+                m2(param[1])
+            except:
+                pass
+def sweep():
+    global switch,killer
+    i=0
+    while True:
+        if killer==True:
+            break
+        if switch=="sweep":
+            i+=1
+            if (i % 2) == 0:
+                param=(0,0)
+            else:
+                param=(180,180)
+            try:
+                m1(param[0])
+            except:
+                pass
+            try:
+                m2(param[1])
+            except:
+                pass
+
 def hand(m1Deg,m2Deg):
+    global switch,killer
     catcher=True
     try:
         m1(m1Deg)
@@ -213,29 +263,77 @@ def hand(m1Deg,m2Deg):
     except:
         catcher=False
     return catcher
+def killOperator():
+    global killer
+    while True:
+        if killer==True:
+            client = socket.socket()
+            client.connect(('localhost',8000))
+            client.send("".encode())
+            client.close()
+            break
+def operator():
+    global switch,killer
+    sock = socket.socket(socket.AF_INET,socket.SOCK_STREAM)
+    sock.bind(('0.0.0.0',8000))
+    sock.listen()
+    while True:
+        if killer==True:
+            break
+        conn,addr = sock.accept()
+        while True:
+            if killer==True:
+                break
+            try:
+                inp=conn.recv(1024).decode()
+                log("GotCommand : "+inp)
+                if inp == "hand":
+                    switch="hand"
+                elif inp == "auto":
+                    switch="auto"
+                elif inp == "rand":
+                    switch="rand"
+                elif inp == "sweep":
+                    switch="sweep"
+                elif inp == "exit":
+                    conn.close()
+                    break
+                else:
+                    try:
+                        degSet=json.loads(inp)
+                        hand(degSet[0],degSet[1])
+                    except:
+                        conn.close()
+                        break
+            except:
+                break
 
 #-------------------------------------#
 
 if __name__ =="__main__":
     threading.Thread(target=auto,args=()).start()
-    sock = socket.socket(socket.AF_INET,socket.SOCK_STREAM)
-    sock.bind(('0.0.0.0',8000))
-    sock.listen()
+    threading.Thread(target=rand,args=()).start()
+    threading.Thread(target=sweep,args=()).start()
+    threading.Thread(target=operator,args=()).start()
+    threading.Thread(target=killOperator,args=()).start()
     while True:
-        conn,addr = sock.accept()
-        try:
-            inp=conn.read(1024).decode()
-            if inp == "hand":
-                autoSwitch=False
-            elif inp == "auto":
-                autoSwitch=True
-            else:
-                try:
-                    degSet=json.loads(inp)
-                    hand(degSet[0],degSet[1])
-                except:
-                    pass
-            conn.close()
-        except:
-            pass
+        inp=input()
+        if inp == "hand":
+            switch="hand"
+        elif inp == "auto":
+            switch="auto"
+        elif inp == "rand":
+            switch="rand"
+        elif inp == "sweep":
+            switch="sweep"
+        elif inp == "exit":
+            killer=True
+            break
+        else:
+            try:
+                degSet=json.loads(inp)
+                hand(degSet[0],degSet[1])
+            except:
+                pass
+    
 
