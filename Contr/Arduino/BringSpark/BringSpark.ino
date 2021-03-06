@@ -2,7 +2,7 @@
 BringSpark Controller
 Author: Bigsk(https://xiaxinzhe.cn)
 Date: 2021.3.3 15:42
-Copyright GHINK Network Stduio
+Copyright GHINK Network Studio
 */
 
 #include <SPI.h>
@@ -14,7 +14,7 @@ byte mac[] = {
 };
 IPAddress ip(192, 168, 1, 3);
 EthernetClient client1,client2;
-IPAddress server(192,168,1,2);//Server IP
+IPAddress server(192, 168,  1,  2);//Server IP
 Servo myservo1,myservo2;
 
 unsigned long lastConnectionTime1,lastConnectionTime2 = 0;
