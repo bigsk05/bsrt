@@ -1,7 +1,7 @@
 '''
 BringSpark Controller
 Author: Bigsk(https://xiaxinzhe.cn)
-Date: 2021.3.3 15:42
+Date: 2021.3.6 14:42
 Copyright GHINK Network Stduio
 '''
 import socket,random,threading,time,os,math,json,sys
