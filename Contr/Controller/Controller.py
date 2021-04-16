@@ -1,8 +1,8 @@
 '''
 BringSpark Controller
-Author: Bigsk(https://xiaxinzhe.cn)
+Author: Bigsk(https://www.xiaxinzhe.cn)
 Date: 2021.3.6 14:42
-Copyright GHINK Network Studio
+  Copyright Bigsk(Xinzhe Xia/IanXia)
 '''
 import socket,random,threading,time,os,math,json,sys
 #-------------------------------------#
@@ -170,6 +170,7 @@ class CalcSun(object):
 now=[90,90]
 switch="auto"
 killer=False
+passfall=["bringspark123456"]
 
 #-------------------------------------#
 def log(text):
@@ -274,7 +275,7 @@ def killOperator():
             client.close()
             break
 def operator():
-    global switch,killer
+    global switch,killer,passfall
     sock = socket.socket(socket.AF_INET,socket.SOCK_STREAM)
     sock.bind(('0.0.0.0',8000))
     sock.listen()
@@ -282,6 +283,9 @@ def operator():
         if killer==True:
             break
         conn,addr = sock.accept()
+        password=conn.recv(1024).decode()
+        if not password in passfall:
+            break
         while True:
             if killer==True:
                 break
@@ -304,14 +308,14 @@ def operator():
                         degSet=json.loads(inp)
                         hand(degSet[0],degSet[1])
                     except:
-                        conn.close()
-                        break
+                        pass
             except:
                 break
 
 #-------------------------------------#
 
 if __name__ =="__main__":
+    os.makedirs("config",exist_ok=True)
     threading.Thread(target=auto,args=()).start()
     threading.Thread(target=rand,args=()).start()
     threading.Thread(target=sweep,args=()).start()
@@ -332,8 +336,8 @@ if __name__ =="__main__":
             break
         else:
             try:
-                degSet=json.loads(inp)
-                hand(degSet[0],degSet[1])
+                inpJson=json.loads(inp)
+                hand(inpJson[0],inpJson[1])
             except:
                 pass
     

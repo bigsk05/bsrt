@@ -1,8 +1,8 @@
 /*
   BringSpark Controller
-  Author: Bigsk(https://xiaxinzhe.cn)
-  Date: 2021.3.6 23:19
-  Copyright GHINK Network Studio
+  Author: Bigsk(https://www.xiaxinzhe.cn)
+  Date: 2021.4.16 16:58
+  Copyright Bigsk(Xinzhe Xia/IanXia)
 */
 
 #include <SPI.h>
@@ -41,7 +41,7 @@ void loop() {
     Serial.println("From M1:");
     while (client1.connected()) {
       if (client1.available()) {
-        char c = client1.read();
+        int c = client1.read();
         Serial.println(c);
         m1.write(c);
       }
@@ -53,7 +53,7 @@ void loop() {
     Serial.println("From M2:");
     while (client2.connected()) {
       if (client2.available()) {
-        char c = client2.read();
+        int c = client2.read();
         Serial.println(c);
         m2.write(c);
       }
