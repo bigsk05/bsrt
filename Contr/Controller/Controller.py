@@ -177,7 +177,7 @@ def log(text):
     print("[",time.strftime("%H:%M:%S",time.localtime()),"]",text)
 def m1(deg):
     deg=round(deg)
-    if deg != now[0] and deg >= 0:
+    if deg != now[0] and deg >= 0 and deg <= 180:
         log("SetDeg M1 : "+str(deg))
         try:
             client1 = socket.socket()
@@ -190,7 +190,7 @@ def m1(deg):
             pass
 def m2(deg):
     deg=round(deg)
-    if deg != now[1] and deg >= 0:
+    if deg != now[1] and deg >= 0 and deg <=180:
         log("SetDeg M2 : "+str(deg))
         try:
             client2 = socket.socket()
@@ -215,6 +215,15 @@ def auto():
                     pass
                 try:
                     m2(param["el"])
+                except:
+                    pass
+            elif param["az"] > 180 and param["az"] >= 0 and param["el"] > 180 and param["el"] >= 0:
+                try:
+                    m1(param["az"]-180)
+                except:
+                    pass
+                try:
+                    m2(180-param["el"])
                 except:
                     pass
 def rand():
