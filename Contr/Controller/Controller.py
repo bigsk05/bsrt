@@ -320,7 +320,6 @@ def operator():
 #-------------------------------------#
 
 if __name__ =="__main__":
-    os.makedirs("config",exist_ok=True)
     threading.Thread(target=auto,args=()).start()
     threading.Thread(target=rand,args=()).start()
     threading.Thread(target=sweep,args=()).start()
