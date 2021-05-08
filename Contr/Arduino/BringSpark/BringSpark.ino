@@ -20,8 +20,8 @@ EthernetServer server1(8001),server2(8002);
 Servo m1,m2;
 
 void setup() {
-  
-
+  m1.attach(6);
+  m2.attach(5);
   //Open serial communications
   Serial.begin(9600);
   //Start the Ethernet connection and the server

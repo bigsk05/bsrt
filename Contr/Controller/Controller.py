@@ -170,7 +170,6 @@ class CalcSun(object):
 now=[90,90]
 switch="auto"
 killer=False
-passfall=["bringspark123456"]
 
 #-------------------------------------#
 def log(text):
@@ -292,9 +291,6 @@ def operator():
         if killer==True:
             break
         conn,addr = sock.accept()
-        password=conn.recv(1024).decode()
-        if not password in passfall:
-            break
         while True:
             if killer==True:
                 break
