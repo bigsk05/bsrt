@@ -2,7 +2,7 @@
 BringSpark Controller
 Author: Bigsk(https://www.xiaxinzhe.cn)
 Date: 2021.3.6 14:42
-  Copyright Bigsk(Xinzhe Xia/IanXia)
+Copyright Bigsk(Xinzhe Xia/IanXia)
 '''
 import socket,random,threading,time,os,math,json,sys
 #-------------------------------------#
@@ -116,9 +116,6 @@ class CalcSun(object):
         Year=int(time.strftime("%Y",time.localtime(TimeStamp)))
         Month=int(time.strftime("%m",time.localtime(TimeStamp)))
         Day=int(time.strftime("%d",time.localtime(TimeStamp)))
-        Hour=int(time.strftime("%H",time.localtime(TimeStamp)))
-        Minute=int(time.strftime("%M",time.localtime(TimeStamp)))
-        Second=int(time.strftime("%S",time.localtime(TimeStamp)))
         if(((Year % 4 == 0 and Year % 100 != 0) or Year % 400 == 0) and (Month == 2)):
             if(Day > 29):
                 Day=29
@@ -283,7 +280,7 @@ def killOperator():
             client.close()
             break
 def operator():
-    global switch,killer,passfall
+    global switch,killer
     sock = socket.socket(socket.AF_INET,socket.SOCK_STREAM)
     sock.bind(('0.0.0.0',8000))
     sock.listen()
@@ -296,7 +293,7 @@ def operator():
                 break
             try:
                 inp=conn.recv(1024).decode()
-                log("GotCommand : "+inp)
+                log("GotCommand : {}".format(inp))
                 if inp == "hand":
                     switch="hand"
                 elif inp == "auto":
@@ -313,7 +310,11 @@ def operator():
                         degSet=json.loads(inp)
                         hand(degSet[0],degSet[1])
                     except:
-                        pass
+                        if inp=="":
+                            log("{} closed the connection.".format(addr))
+                            break
+                        else:
+                            pass
             except:
                 break
 
